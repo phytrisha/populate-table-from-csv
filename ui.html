@@ -1,0 +1,53 @@
+<h2>Populate Table from CSV</h2>
+
+<div>
+  <input type="checkbox" id="columns" name="horns" />
+  <label for="columns">Columns?</label>
+</div>
+
+<form id="csvForm">
+  <input type="file" id="csvInput" accept=".csv" />
+  <input type="submit" value="Submit" id="submitCsv"/>
+</form>
+
+<script>
+
+const form = document.querySelector("#csvForm");
+const csvFileInput = document.querySelector("#csvInput");
+const columns = document.querySelector("#columns");
+
+form.addEventListener("submit", function (e) {
+  e.preventDefault();
+  const file = csvFileInput.files[0];
+  const reader = new FileReader();
+
+  let output = "";
+
+  reader.onload = function (e) {
+    
+    if (columns.checked) {
+      const lines = e.target.result.split(/(?:\r\n|\r|\n)/g)
+      let elements = []
+
+      for (let i = 0; i < lines.length; i++) {
+        const element = lines[i].split(",");
+        elements.push(element)
+      }
+
+      for (let i = 0; i < elements[0].length; i++) {
+        for (let j = 0; j < elements.length; j++) {
+          output += elements[j][i] + ","
+        }
+      }
+    } else {
+      output = e.target.result.replace(/(?:\r\n|\r|\n)/g, ",");
+    }
+
+    const csvArray = output.split(",");
+    
+    parent.postMessage({ pluginMessage: { csvArray: csvArray } }, '*');
+  };
+
+  reader.readAsText(file);  
+});
+</script>
